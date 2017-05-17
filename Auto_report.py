@@ -92,8 +92,15 @@ class Report(QtGui.QWidget):
         # 医疗文字书写doc
         sql = '''select * from b_pn_work_jjx WHERE CURPOSNAME = "%s" AND CALINDUSTRY = "3"'''%today
         self.mysql_cursor.execute(sql)
-        result = self.mysql_cursor.fetchall()[0]
-        # print  result
+        try:
+            result = self.mysql_cursor.fetchall()[0]
+            # print  result
+        except:
+            msg_box = QMessageBox(QMessageBox.Warning, u"提示", u"该天无数据")
+            msg_box.show()
+            qe = QEventLoop()  # 阻塞
+            qe.exec_()
+            return
         number = result[1]
         number = int(number) - 2
         # print number, type(number)

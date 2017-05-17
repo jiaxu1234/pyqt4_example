@@ -5,6 +5,7 @@ import sys
 from PyQt4 import QtGui,QtCore
 from PyQt4.QtGui import *
 import chardet
+import time
 
 class Add_delete(QtGui.QWidget):
     def __init__(self, parent = None):
@@ -34,10 +35,10 @@ class Add_delete(QtGui.QWidget):
         gridlayout.addWidget(self.set, 0, 2)
         self.set.clicked.connect(self.button3)
 
-        self.before_path_name = 'C:/Users/Administrator/Desktop/model_PyQt/before_after/words_add_delete/words_before.txt'
-        self.after_path_name  = 'C:/Users/Administrator/Desktop/model_PyQt/before_after/words_add_delete/words_after.txt'
-        self.before_path_name = ''
-        self.after_path_name = ''
+        self.before_path_name = 'C:/Users/Administrator/Desktop/model_PyQt/all_of_the_aaaaaaaaaaaaaaaaaaaa/before_after/words_add_delete/words_before.txt'
+        self.after_path_name  = 'C:/Users/Administrator/Desktop/model_PyQt/all_of_the_aaaaaaaaaaaaaaaaaaaa/before_after/words_after.txt'
+        # self.before_path_name = ''
+        # self.after_path_name = ''
 
 
         label = QtGui.QLabel(u'删除数据量')  # 创建标签
@@ -88,13 +89,30 @@ class Add_delete(QtGui.QWidget):
             qe = QEventLoop()  # 阻塞
             qe.exec_()
 
+    def sort(self,mdzz):
+        n= 0
+        while n<len(mdzz):
+            for i in range(0,len(mdzz)):
+                if i<len(mdzz)-1:
+                    if len(mdzz[i])>len(mdzz[i+1]):
+                        # print mdzz[i],mdzz[i+1]
+                        mdzz[i],mdzz[i+1] = mdzz[i+1],mdzz[i]
+                # print mdzz
+            n+=1
+        return mdzz
+
+
     def main(self):
+        t1 = time.time()
+
         l_before_list = self.get_txt_words_list(self.before_path_name)
         l_after_list = self.get_txt_words_list(self.after_path_name)
 
         delete_list = set(l_before_list) - set(l_after_list)
         length_delete = len(delete_list)
         print u"删除数据量：%s" % length_delete
+
+        # delete_list = self.sort(list(delete_list))
 
         text1 = ''
         for aaa in delete_list:
@@ -110,6 +128,9 @@ class Add_delete(QtGui.QWidget):
         add_list = set(l_after_list) - set(l_before_list)
         length_add = len(add_list)
         print u"增加数据量：%s" % length_add
+
+        # add_list = self.sort(list(add_list))
+
         text2 = ''
         for bbb in add_list:
             text2 = text2 + bbb + '\n'
@@ -120,17 +141,23 @@ class Add_delete(QtGui.QWidget):
         jiaoji = set(l_after_list) & set(l_before_list)
         length_jiaoji = len(jiaoji)
         print u"相同数据量：%s" % length_add
+
+        # jiaoji = self.sort(list(jiaoji))
+
         text3 = ''
         for ccc in jiaoji:
             text3 = text3 + ccc + '\n'
         text3 = text3.decode("gbk").encode("utf-8")
         text3 = "相同数据量：%s" % length_add + '\n\n' + text3
-        self.edit3.setText(text2.decode('utf-8'))
+        self.edit3.setText(text3.decode('utf-8'))
 
         self.before_path_name = ''
         self.after_path_name = ''
 
         print u"ACHIEVE"
+
+        t2 = time.time()
+        print float(t2-t1)
 
     def get_txt_words_list(self,file_name):
         with open(file_name, 'r') as fd:
@@ -145,3 +172,8 @@ if __name__ == '__main__':
     home = Add_delete()
     home.show()
     sys.exit(app.exec_())
+
+
+    # a = ['aa','a','aaaaaaaaaaa','aaaa','aaa','aaaaa']
+    # b = home.sort(a)
+    # print b

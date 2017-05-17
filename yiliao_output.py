@@ -12,6 +12,7 @@ import difflib
 import time
 import shutil
 from PyQt4.QtGui import *
+import time
 
 class Output(QtGui.QWidget):
     def __init__(self, parent = None):
@@ -81,12 +82,14 @@ class Output(QtGui.QWidget):
 
 
     def main(self,file_path):
+        t1 = time.time()
+
         data_types = ['yiliao']
         print u"*************程序运行中,请稍等···*************\n"
         for data_type in data_types:
-            file_name = 'model_info_%s.csv' % data_type  # 生成的csv文件名称
+            file_name = 'model_info_%s_%s.csv' % (data_type,self.crawled_time)  # 生成的csv文件名称
             mysql_name = 'model_info_%s' % data_type  # 医疗信息表
-            file_like_name = 'model_info_like_%s.csv' % data_type  # 医疗信息表
+            file_like_name = 'model_info_like_%s_%s.csv' % (data_type,self.crawled_time)  # 医疗信息表
 
             print self.crawled_time
             lists, url_likes = self.data_out(mysql_name, self.crawled_time)
@@ -98,18 +101,20 @@ class Output(QtGui.QWidget):
                 # sql = 'update %s set flag="0"'%mysql_name
                 # cursor.execute(sql)
         print u"*************恭喜您,数据全部写入完毕*************"
-        self.cursor.close()
-        self.mysql_conn.close()
+        # self.cursor.close()
+        # self.mysql_conn.close()
 
         shutil.move(sys.path[0] + '\\' + file_name, file_path + '\\' + file_name)
+
+        t2 = time.time()
+        print float(t2-t1)
 
     def data_out(self,mysql_name, crawled_time):
         d_type = mysql_name.split('_')[-1]
         lists = [[('url', 'crawled', 'title', "source", "content")]]  # 表头
 
         # 查找医疗信息,时间为当天时间
-        sql = 'select * from %s where crawled like "%s%%" and flag="0" order by crawled DESC' % (
-        mysql_name, crawled_time)
+        sql = 'select * from %s where crawled like "%s%%" and flag="0" order by crawled DESC' % (mysql_name, crawled_time)
         print sql
         # 查找医疗信息,信息为还没有导出过的数据
         # sql = 'select * from %s where flag="0"'%mysql_name
@@ -118,6 +123,12 @@ class Output(QtGui.QWidget):
         length = len(infos)
         if length == 0:
             print u"没有新数据"
+
+            msg_box = QMessageBox(QMessageBox.Warning, u"提示", u"没有符合条件的数据")
+            msg_box.show()
+            qe = QEventLoop()  # 阻塞
+            qe.exec_()
+
             return [], []
         if length > 500:
             s_time = 0.001
@@ -136,7 +147,7 @@ class Output(QtGui.QWidget):
             if like_flag:
                 # print u"此条信息为相似信息,不导出"
                 sql = 'update %s set flag="0" where url="%s"' % (mysql_name, url)  # 测试时改为0，不改为4
-                cursor.execute(sql)
+                self.cursor.execute(sql)
                 continue
             try:
                 crawled = info[1].encode("utf8")
@@ -175,10 +186,10 @@ class Output(QtGui.QWidget):
                 if like > 0.5:  # 阈值
                     like = difflib.SequenceMatcher(None, content, content_next).ratio()
                     if like > 0.7:
-                        url_dic[url_next] = 1
+                        self.url_dic[url_next] = 1
                         url_likes_list.append(url_next)
             if url_likes_list:
-                url_likes_lists[url] = url_likes_list
+                self.url_likes_lists[url] = url_likes_list
             l = [(url, crawled, title, source, content)]
             lists.append(l)
             start = start + step
