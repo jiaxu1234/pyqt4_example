@@ -35,10 +35,12 @@ class Add_delete(QtGui.QWidget):
         gridlayout.addWidget(self.set, 0, 2)
         self.set.clicked.connect(self.button3)
 
-        self.before_path_name = 'C:/Users/Administrator/Desktop/model_PyQt/all_of_the_aaaaaaaaaaaaaaaaaaaa/before_after/words_add_delete/words_before.txt'
-        self.after_path_name  = 'C:/Users/Administrator/Desktop/model_PyQt/all_of_the_aaaaaaaaaaaaaaaaaaaa/before_after/words_after.txt'
-        # self.before_path_name = ''
-        # self.after_path_name = ''
+        # self.before_path_name = 'C:/Users/Administrator/Desktop/model_PyQt/all_of_the_aaaaaaaaaaaaaaaaaaaa/before_after/words_add_delete/words_before.txt'
+        # self.after_path_name  = 'C:/Users/Administrator/Desktop/model_PyQt/all_of_the_aaaaaaaaaaaaaaaaaaaa/before_after/words_add_delete/words_after.txt'
+        self.before_path_name = ''
+        self.after_path_name = ''
+
+        gridlayout.setRowMinimumHeight(3, 500)
 
 
         label = QtGui.QLabel(u'删除数据量')  # 创建标签
@@ -46,7 +48,12 @@ class Add_delete(QtGui.QWidget):
         gridlayout.addWidget(label, 1, 0)
         self.edit1 = QtGui.QTextEdit()  # 创建多行文本框
         self.edit1.setText('删除数据量'.decode('utf8'))  # 设置文本框中的文字
-        gridlayout.addWidget(self.edit1, 2, 0)
+        gridlayout.addWidget(self.edit1, 2, 0, 1, 1)
+        self.setLayout(gridlayout)
+
+        self.edit11 = QtGui.QTextEdit()  # 创建多行文本框
+        self.edit11.setText('删除数据量'.decode('utf8'))  # 设置文本框中的文字
+        gridlayout.addWidget(self.edit11,3,0,8,1)
         self.setLayout(gridlayout)
 
         labe2 = QtGui.QLabel(u'增加数据量')  # 创建标签
@@ -54,7 +61,12 @@ class Add_delete(QtGui.QWidget):
         gridlayout.addWidget(labe2, 1, 1)
         self.edit2 = QtGui.QTextEdit()  # 创建多行文本框
         self.edit2.setText('增加数据量'.decode('utf8'))  # 设置文本框中的文字
-        gridlayout.addWidget(self.edit2, 2, 1)
+        gridlayout.addWidget(self.edit2, 2, 1, 1, 1)
+        self.setLayout(gridlayout)
+
+        self.edit22 = QtGui.QTextEdit()  # 创建多行文本框
+        self.edit22.setText('增加数据量'.decode('utf8'))  # 设置文本框中的文字
+        gridlayout.addWidget(self.edit22, 3, 1, 8, 1)
         self.setLayout(gridlayout)
 
         labe3 = QtGui.QLabel(u'相同数据量')  # 创建标签
@@ -62,7 +74,12 @@ class Add_delete(QtGui.QWidget):
         gridlayout.addWidget(labe3, 1, 2)
         self.edit3 = QtGui.QTextEdit()  # 创建多行文本框
         self.edit3.setText('相同数据量'.decode('utf8'))  # 设置文本框中的文字
-        gridlayout.addWidget(self.edit3, 2, 2)
+        gridlayout.addWidget(self.edit3, 2, 2, 1, 1)
+        self.setLayout(gridlayout)
+
+        self.edit33 = QtGui.QTextEdit()  # 创建多行文本框
+        self.edit33.setText('相同数据量'.decode('utf8'))  # 设置文本框中的文字
+        gridlayout.addWidget(self.edit33, 3, 2, 8, 1)
         self.setLayout(gridlayout)
 
     def button1(self):
@@ -112,7 +129,7 @@ class Add_delete(QtGui.QWidget):
         length_delete = len(delete_list)
         print u"删除数据量：%s" % length_delete
 
-        # delete_list = self.sort(list(delete_list))
+        delete_list = self.sort(list(delete_list))
 
         text1 = ''
         for aaa in delete_list:
@@ -120,36 +137,42 @@ class Add_delete(QtGui.QWidget):
         text1 = text1.decode("gbk").encode("utf-8")
         # print chardet.detect(text1)
         # print chardet.detect( "删除数据量：")
-        text1 = "删除数据量：%s" % length_delete + '\n\n' + text1
+        # text1 = "删除数据量：%s" % length_delete + '\n\n' + text1
+        text11 = "删除数据量：%s" % length_delete
         # print text1
         # print chardet.detect(text1)
-        self.edit1.setText(text1.decode('utf-8'))
+        self.edit1.setText(text11.decode('utf-8'))
+        self.edit11.setText(text1.decode('utf-8'))
 
         add_list = set(l_after_list) - set(l_before_list)
         length_add = len(add_list)
         print u"增加数据量：%s" % length_add
 
-        # add_list = self.sort(list(add_list))
+        add_list = self.sort(list(add_list))
 
         text2 = ''
         for bbb in add_list:
             text2 = text2 + bbb + '\n'
         text2 = text2.decode("gbk").encode("utf-8")
-        text2 = "增加数据量：%s" % length_add + '\n\n' + text2
-        self.edit2.setText(text2.decode('utf-8'))
+        # text2 = "增加数据量：%s" % length_add + '\n\n' + text2
+        text22 = "增加数据量：%s" % length_add
+        self.edit2.setText(text22.decode('utf-8'))
+        self.edit22.setText(text2.decode('utf-8'))
 
         jiaoji = set(l_after_list) & set(l_before_list)
         length_jiaoji = len(jiaoji)
         print u"相同数据量：%s" % length_add
 
-        # jiaoji = self.sort(list(jiaoji))
+        jiaoji = self.sort(list(jiaoji))
 
         text3 = ''
         for ccc in jiaoji:
             text3 = text3 + ccc + '\n'
         text3 = text3.decode("gbk").encode("utf-8")
-        text3 = "相同数据量：%s" % length_add + '\n\n' + text3
-        self.edit3.setText(text3.decode('utf-8'))
+        # text3 = "相同数据量：%s" % length_add + '\n\n' + text3
+        text33 = "相同数据量：%s" % length_add
+        self.edit3.setText(text33.decode('utf-8'))
+        self.edit33.setText(text3.decode('utf-8'))
 
         self.before_path_name = ''
         self.after_path_name = ''

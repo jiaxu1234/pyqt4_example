@@ -26,18 +26,29 @@ class Output(QtGui.QWidget):
         palette.setBrush(self.backgroundRole(), QtGui.QBrush(background))  # 添加背景图片
         self.setPalette(palette)
 
-        self.cal = QtGui.QCalendarWidget(self)
-        # self.cal.setGridVisible(True)
-        self.cal.setGeometry(250, 50, 300, 180)
-        self.connect(self.cal, QtCore.SIGNAL('selectionChanged()'), self.select)
+        gridlayout = QtGui.QGridLayout()
+        self.edit1 = QtGui.QTextEdit()  # 创建多行文本框
+        self.edit1.setText(''.decode('utf8'))  # 设置文本框中的文字
+        gridlayout.addWidget(self.edit1, 3, 0)
+        self.setLayout(gridlayout)
+
+        # self.cal = QtGui.QCalendarWidget(self)
+        # # self.cal.setGridVisible(True)
+        # self.cal.setGeometry(250, 50, 300, 180)
+        # gridlayout.addWidget(self.cal, 1, 0)
+        # self.connect(self.cal, QtCore.SIGNAL('selectionChanged()'), self.select)
 
         self.output = QtGui.QPushButton(u'一键导出', self)
-        self.output.setGeometry(300, 230, 200, 70)
+        # self.output.setGeometry(300, 230, 200, 70)
+        gridlayout.addWidget(self.output, 2, 0)
         self.output.clicked.connect(self.button)
 
+        gridlayout.setRowMinimumHeight(1, 50)
+
         self.back = QtGui.QPushButton(u'后退', self)
-        self.back.setGeometry(20, 20, 60, 40)
+        self.back.setGeometry(12, 20, 60, 40)
         self.back.clicked.connect(self.backbutton)
+
 
         self.mysql_conn = MySQLdb.connect(
             host='192.168.16.68',
@@ -53,9 +64,9 @@ class Output(QtGui.QWidget):
         self.url_dic = {}  # 相似度超过阈值的链接value设置为1
         self.url_likes_lists = {}  # 存储相似度超过阈值的链接  {'url':[url1,url2,url3,...]}
 
-        self.crawled_time = ''
+        self.crawled_time = '2017'
 
-        # self.crawled_time = time.strftime("%Y-%m-%d", time.localtime())
+        self.today = time.strftime("%Y-%m-%d", time.localtime())
         # crawled_time = (datetime.datetime.now()-datetime.timedelta(1)).strftime('%Y-%m-%d')  # 采集时间为昨天  参数1可以修改，代表几天前
         # crawled_time = '2017-05-12'  # 直接标注某天
 
@@ -86,12 +97,13 @@ class Output(QtGui.QWidget):
 
         data_types = ['yiliao']
         print u"*************程序运行中,请稍等···*************\n"
+        self.edit1.append(u"*************程序运行中,请稍等···*************\n")
+        QApplication.processEvents()
         for data_type in data_types:
-            file_name = 'model_info_%s_%s.csv' % (data_type,self.crawled_time)  # 生成的csv文件名称
+            file_name = 'model_info_%s_%s.csv' % (data_type,self.today)  # 生成的csv文件名称
             mysql_name = 'model_info_%s' % data_type  # 医疗信息表
             file_like_name = 'model_info_like_%s_%s.csv' % (data_type,self.crawled_time)  # 医疗信息表
 
-            print self.crawled_time
             lists, url_likes = self.data_out(mysql_name, self.crawled_time)
             if lists:
                 self.csv_write(lists, file_name, False)
@@ -101,6 +113,8 @@ class Output(QtGui.QWidget):
                 # sql = 'update %s set flag="0"'%mysql_name
                 # cursor.execute(sql)
         print u"*************恭喜您,数据全部写入完毕*************"
+        self.edit1.append(u"*************恭喜您,数据全部写入完毕*************")
+        QApplication.processEvents()
         # self.cursor.close()
         # self.mysql_conn.close()
 
@@ -108,6 +122,8 @@ class Output(QtGui.QWidget):
 
         t2 = time.time()
         print float(t2-t1)
+        self.edit1.append(u"耗时：%s" % float(t2-t1))
+        QApplication.processEvents()
 
     def data_out(self,mysql_name, crawled_time):
         d_type = mysql_name.split('_')[-1]
@@ -123,6 +139,8 @@ class Output(QtGui.QWidget):
         length = len(infos)
         if length == 0:
             print u"没有新数据"
+            self.edit1.append(u"没有新数据")
+            QApplication.processEvents()
 
             msg_box = QMessageBox(QMessageBox.Warning, u"提示", u"没有符合条件的数据")
             msg_box.show()
@@ -137,7 +155,11 @@ class Output(QtGui.QWidget):
         else:
             s_time = 0.1
         print u"***************一共查询到%s条%s信息***************\n" % (length, d_type)
+        self.edit1.append(u"***************一共查询到%s条%s信息***************\n" % (length, d_type))
+        QApplication.processEvents()
         print u"**********正在查询%s数据,请稍等···**********\n" % d_type
+        self.edit1.append(u"**********正在查询%s数据,请稍等···**********\n" % d_type)
+        QApplication.processEvents()
         output = sys.stdout
         start = 0
         step = 100.0 / length
@@ -195,6 +217,8 @@ class Output(QtGui.QWidget):
             start = start + step
             sleep(s_time)
             output.write('\rcomplete percent:%.0f%%' % start)
+            self.edit1.append(u'\rcomplete percent:%.0f%%' % start)
+            QApplication.processEvents()
             sql = 'update %s set flag="0" where url="%s"' % (mysql_name, url)  # 测试时改为0，不改为1
             self.cursor.execute(sql)
         output.flush()
@@ -222,6 +246,8 @@ class Output(QtGui.QWidget):
         还可处理非字典形式  [(1,2),(2,3)]
         '''
         print u"**********正在写入到文件中,请稍等···**********"
+        self.edit1.append(u"**********正在写入到文件中,请稍等···**********")
+        QApplication.processEvents()
         if not file_name:
             file_name = 'model_info_yiliao.csv'
         d_type = file_name.split('_')[-1].replace('.csv', '')
@@ -254,8 +280,12 @@ class Output(QtGui.QWidget):
             start = start + step
             sleep(s_time)
             output.write('\rcomplete percent:%.0f%%' % start)
+            self.edit1.append(u'\rcomplete percent:%.0f%%' % start)
+            QApplication.processEvents()
         output.flush()
         print u"\n恭喜您,%s数据写入成功\n" % d_type
+        self.edit1.append(u"\n恭喜您,%s数据写入成功\n" % d_type)
+        QApplication.processEvents()
         return
 
 
